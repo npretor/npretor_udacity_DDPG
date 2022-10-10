@@ -7,6 +7,8 @@ class DDPG_model(nn.Module):
         super(DDPG_model, self).__init__()
         self.seed = torch.manual_seed(seed)
 
+        self.device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+
         self.fc1 = torch.nn.Linear(input_size, 64)
         self.fc2 = torch.nn.Linear(64, 64)
         self.fc3 = torch.nn.Linear(64, output_size)
