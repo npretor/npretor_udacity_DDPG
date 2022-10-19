@@ -1,4 +1,3 @@
-
 import random
 import torch
 import numpy as np
@@ -6,11 +5,10 @@ from collections import deque
 import matplotlib.pyplot as plt
 from unityagents import UnityEnvironment
 
-
 from ddpg_agent import Agent 
 
 # = = = = = = = = = Enviroment initialization = = = = = = = = = # 
-env = UnityEnvironment(file_name='Reacher.app')
+env = UnityEnvironment(file_name='Reacher_Linux/Reacher.x86')
 brain_name = env.brain_names[0]
 brain = env.brains[brain_name]
 env_info = env.reset(train_mode=True)[brain_name]

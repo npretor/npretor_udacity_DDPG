@@ -79,11 +79,11 @@ class DQN_model(nn.Module):
         self.fc3 = nn.Lienar(hidden_size, output_size)  
 
 
-    def forward(self, action):
-        x = nn.Relu(self.fc1(action))
+    def forward(self, state):
+        x = nn.Relu(self.fc1(state))
         x = nn.Relu(self.fc2(x))
-        state = nn.Relu(self.fc3(x))
-        return state 
+        action = nn.Relu(self.fc3(x))
+        return action 
 
 
 class Agent:
@@ -104,7 +104,7 @@ class Agent:
         if np.random.random > exp_exp_rati0:
             # select random action from the possible states 
             # Map from 0-1.0 to joint value distribution
-            # np.random()
+            # 
             pass
         else:
             # Select the action using the target critic network
@@ -117,7 +117,7 @@ class Agent:
         self.memory.add(state, action, reward, next_state, done) 
 
         # Sample a batch of transitions 
-        # set y_i = reward + gamma*( self.) 
+        # Set: y_i = reward + gamma*( self.) 
         # Update critic 
         #    L = (1/n) * y_i - 
 
