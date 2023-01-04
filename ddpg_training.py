@@ -2,8 +2,9 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 import numpy as np 
+import random 
 
-from agent import Agent, ReplayBuffer
+from ddpg_agent import Agent, ReplayBuffer
 
 n_episodes = 100
 from collections import deque
@@ -29,7 +30,7 @@ Retrain every n experiences
 # = = = = = = = = Environment initialization = = = = = = = = # 
 from unityagents import UnityEnvironment
 
-env = UnityEnvironment(file_name='...') 
+env = UnityEnvironment(file_name='./Reacher_Linux/Reacher.x86') 
 brain_name = env.brain_names[0] 
 brain = env.brains[brain_name]  
 env_info = env.reset(train_mode=True)[brain_name] 
@@ -43,17 +44,15 @@ print('Size of each action:', action_size)
 print('There are {} agents. Each observes a state with length: {}'.format(states.shape[0], state_size))
 print('The state for the first agent looks like:', states[0])
 
-
-
 num_episodes = 100 
 experiences = deque(maxlen=100) 
-agent = Agent(5, 10) 
+agent = Agent(5, 10, random_seed=10) 
 max_timesteps = 100 
 
 
-action = agent.act() 
-state, action, reward, done = env.receive_action(action) 
-experiences.append([state, action, reward, done]) 
+# action = agent.act() 
+# state, action, reward, done = env.receive_action(action) 
+# experiences.append([state, action, reward, done]) 
 
 
 for episode_num in range(1, num_episodes):
@@ -76,7 +75,7 @@ class DQN_model(nn.Module):
         super(DQN_model, self).__init__() 
         self.fc1 = nn.Linear(input_size, hidden_size)   
         self.fc2 = nn.Linear(hidden_size, hidden_size)  
-        self.fc3 = nn.Lienar(hidden_size, output_size)  
+        self.fc3 = nn.Linear(hidden_size, output_size)  
 
 
     def forward(self, state):
