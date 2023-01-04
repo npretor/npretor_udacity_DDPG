@@ -12,7 +12,7 @@ import torch.optim as optim
 
 
 #device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
-device = torch.device("cpu")
+device = torch.device("cpu") 
 
 class Agent():
     """Interacts with and learns from the environment."""
@@ -47,13 +47,13 @@ class Agent():
         # Replay memory
         self.memory = ReplayBuffer(action_size, self.settings["BUFFER_SIZE"], self.settings["BATCH_SIZE"], random_seed)
     
-    def step(self, state, action, reward, next_state, done):
+    def step(self, state, action, reward, next_state, done, timestep):
         """Save experience in replay memory, and use random sample from buffer to learn."""
         # Save experience / reward 
         self.memory.add(state, action, reward, next_state, done)
 
         # Learn, if enough samples are available in memory
-        if len(self.memory) > self.settings["BATCH_SIZE"]:
+        if len(self.memory) > self.settings["BATCH_SIZE"] and (timestep % self.settings["LEARN_EVERY"]) == 0:
             experiences = self.memory.sample()
             self.learn(experiences, self.settings["GAMMA"])
 
@@ -87,7 +87,9 @@ class Agent():
 
         # ---------------------------- update critic ---------------------------- #
         # Get predicted next-state actions and Q values from target models
+        # Given a state, predict the action
         actions_next = self.actor_target(next_states)
+        # Given a state and an action, determine the reward 
         Q_targets_next = self.critic_target(next_states, actions_next)
         # Compute Q targets for current states (y_i)
         Q_targets = rewards + (gamma * Q_targets_next * (1 - dones))

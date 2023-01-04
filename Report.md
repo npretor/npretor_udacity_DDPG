@@ -14,12 +14,9 @@ Start training episodes. This looks like the agents choosing an action, having t
 ## 1. The agent chooses an action 
 When we start, the main actor gets an action based on the current state. however, the network is randomly initialized, so not much should happen. We then train the main actor on what just happened, and add a bit of random noise, not sure why yet or what we are training on.  
 
-
-
-
 ## 2. The environment responds 
 ## 3. The agent gets the result 
-
+The agent get the resulting action and reward and adds it to a list of memories. The <b>batch size</b> is the number of actions to wait before training. 
 
 
 DDPG uses 4 networks: 
@@ -49,6 +46,8 @@ Actor (Policy) & Critic (Value)
 ### Tau 
 
 ### Actor learning rate 
+The learning rate is the amount by which the network nodes are updated. A common default value would be 0.1, meaning the weights of the network are updated by one tenth of the estimated weight error. 
+A larger learning rate allows for faster learning, but means a solution will be arrived at which is probably less than optimal. A smaller learning rate will learn slowly, and too small and the model will oscillate over training periods
 
 ### Critic learning rate 
 
