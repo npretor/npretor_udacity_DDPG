@@ -36,7 +36,6 @@ Target networks: these learn slower, they follow along the main network.
 Actor (Policy) & Critic (Value)
 
 ## Hyperparameters
-
 ### Buffer size 
 
 ### Batch size 
@@ -56,4 +55,16 @@ A larger learning rate allows for faster learning, but means a solution will be 
 ### Number of episodes 
 
 ### Network shape 
+
+
+## Training experience 
+Early training episodes I trained for 20. No success, no score above 4.
+Tried training with single agent training, one episode reached 14, then fell down to 8 and kept falling after 5000 episodes. 
+Then wrote a multi-agent training script and agent. 
+(fluent-oath-2) Tried on training session for 1500, peaked at 5, then oscillated up and down between 3 and 4 with a period of about 500 episodes peak to peak. 
+(noble-blaze-3) Segfault 
+(fluent-dust-4) Reduced the critic and actor learning rates from 10^-3 to 10^-4, hoping this prevents oscillations. Segfault at 700 episodes
+(rural-spaceships-5) Restarted training, changed gamma from 0.95 to 0.99. Peaked at 2.5 early, then gradually declined to 1. 
+(charmed-wave-6) Changed to learn every 4 episodes instead of every episode. Slow linear growth up to .44. 
+
 
