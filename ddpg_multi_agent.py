@@ -50,7 +50,7 @@ class Agent():
         self.critic_optimizer = optim.Adam(self.critic_local.parameters(), lr=self.settings["LR_CRITIC"], weight_decay=self.settings["WEIGHT_DECAY"])
 
         # Noise process
-        self.noise = OUNoise(action_size, random_seed)
+        self.noise = OUNoise(self.num_agents*action_size, random_seed)
 
         # Replay memory
         self.memory = ReplayBuffer(action_size, self.settings["BUFFER_SIZE"], self.settings["BATCH_SIZE"], random_seed)
@@ -65,11 +65,11 @@ class Agent():
             self.memory.add(states[i], actions[i], rewards[i], next_states[i], dones[i])
 
         # Learn, if enough samples are available in memory
-        if len(self.memory) > self.settings["BATCH_SIZE"] and (timestep % self.settings["LEARN_EVERY"]) == 0:
+        if len(self.memory) > self.settings["BATCH_SIZE"]: # and (timestep % self.settings["LEARN_EVERY"]) == 0:
             experiences = self.memory.sample()
             self.learn(experiences, self.settings["GAMMA"]) 
 
-    def act(self, states, add_noise=True):
+    def act(self, state, add_noise=True):
         """
         states(list): 
             list of states for each agent 
@@ -77,26 +77,24 @@ class Agent():
             actions for given state as per current policy 
         """
         # Convert states from numpy to tensor 
-        states = torch.from_numpy(states).float().to(device) 
+        state = torch.from_numpy(state).float().to(device) 
 
         # Create an empty list of actions 
-        actions = np.zeros((self.num_agents, self.action_size)) 
+        #actions = np.zeros((self.num_agents, self.action_size)) 
         
         # Set network to eval mode (as opposed to training mode)
         self.actor_local.eval() 
 
         # Get a state from actor_local and add it to the list of states for each actor  
         with torch.no_grad():
-            for i in range(self.num_agents): 
-                #actions[i] = self.actor_local(states[i]).cpu().data.numpy() 
-                action = self.actor_local(states[i]).cpu().data.numpy() 
-                actions[i, :] = action
+                 #actions[i] = self.actor_local(states[i]).cpu().data.numpy() 
+                action = self.actor_local(state).cpu().data.numpy() 
 
 
         self.actor_local.train()
         if add_noise:
-            actions += self.noise.sample()
-        return np.clip(actions, -1, 1)
+            actions += self.noise.sample()  # unsure about this one 
+        return np.clip(action, -1, 1)
 
     def reset(self):
         self.noise.reset()
@@ -129,7 +127,7 @@ class Agent():
         critic_loss.backward()
 
         # Taken from: https://github.com/adaptationio/DDPG-Continuous-Control/blob/master/agent.py
-        torch.nn.utils.clip_grad_norm_(self.critic_local.parameters(), 1)     
+        # torch.nn.utils.clip_grad_norm_(self.critic_local.parameters(), 1)     
 
         self.critic_optimizer.step()
 
@@ -217,7 +215,7 @@ class ReplayBuffer:
         next_states = torch.from_numpy(np.vstack([e.next_state for e in experiences if e is not None])).float().to(device)
         dones = torch.from_numpy(np.vstack([e.done for e in experiences if e is not None]).astype(np.uint8)).float().to(device)
 
-        return (states, actions, rewards, next_states, dones)
+        return states, actions, rewards, next_states, dones
 
     def __len__(self):
         """Return the current size of internal memory."""
