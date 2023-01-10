@@ -10,19 +10,19 @@ import wandb
 
 # Hyperparameters
 settings = {
-    "BUFFER_SIZE": int(1000000),     # replay buffer size 
-    "BATCH_SIZE" : 1024,             # minibatch size 
-    "GAMMA" : 0.95,                  # discount factor 
+    "BUFFER_SIZE": int(100000),     # replay buffer size 
+    "BATCH_SIZE" : 256,             # minibatch size 
+    "GAMMA" : 0.99,                  # discount factor 
     "TAU" : 1e-3,                    # for soft update of target parameters 
     "LR_ACTOR" : 1e-3,               # learning rate of the actor   
     "LR_CRITIC" : 1e-3,              # learning rate of the critic  
     "WEIGHT_DECAY": 0,              # L2 weight decay
-    "num_episodes": 5000,
+    "num_episodes": 1000, 
     "max_timesteps": 1000, 
-    "actor_network_shape": [128, 64, 32],
-    "critic_network_shape": [128, 64, 32], 
-    "LEARN_EVERY": 1
-}  
+    "actor_network_shape": [256, 128, 0],
+    "critic_network_shape": [256, 128, 0], 
+    "LEARN_EVERY": 0
+} 
 
 
 wandb.init(project="npretor_udacity_DDPG-multiagent", config=settings) 
