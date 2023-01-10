@@ -50,19 +50,19 @@ class Agent():
         self.critic_optimizer = optim.Adam(self.critic_local.parameters(), lr=self.settings["LR_CRITIC"], weight_decay=self.settings["WEIGHT_DECAY"])
 
         # Noise process
-        self.noise = OUNoise(self.num_agents*action_size, random_seed)
+        self.noise = OUNoise(action_size, random_seed)
 
         # Replay memory
         self.memory = ReplayBuffer(action_size, self.settings["BUFFER_SIZE"], self.settings["BATCH_SIZE"], random_seed)
     
-    def step(self, states, actions, rewards, next_states, dones, timestep):
+    def step(self, state, action, reward, next_state, done, timestep):
         """
         Save experience in replay memory, and use random sample from buffer to learn.
         
         """
         # Save each experience 
-        for i in range(len(states)):
-            self.memory.add(states[i], actions[i], rewards[i], next_states[i], dones[i])
+        #for i in range(len(states)):
+        self.memory.add(state, action, reward, next_state, done) 
 
         # Learn, if enough samples are available in memory
         if len(self.memory) > self.settings["BATCH_SIZE"]: # and (timestep % self.settings["LEARN_EVERY"]) == 0:
@@ -93,7 +93,7 @@ class Agent():
 
         self.actor_local.train()
         if add_noise:
-            actions += self.noise.sample()  # unsure about this one 
+            action += self.noise.sample()  # unsure about this one 
         return np.clip(action, -1, 1)
 
     def reset(self):

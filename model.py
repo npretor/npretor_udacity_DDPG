@@ -57,12 +57,12 @@ class Critic(nn.Module):
             fc2_units (int): Number of nodes in the second hidden layer
         """
         super(Critic, self).__init__()
-        self.seed = torch.manual_seed(seed)
-        self.bn1 = nn.BatchNorm1d(state_size) 
-        self.fcs1 = nn.Linear(state_size, network_shape[0])
-        self.fc2 = nn.Linear(network_shape[0]+action_size, network_shape[1])
-        #self.fc3 = nn.Linear(network_shape[1], network_shape[2])
-        self.fc4 = nn.Linear(network_shape[1], 1)
+        self.seed =     torch.manual_seed(seed)
+        self.bn1 =      nn.BatchNorm1d(state_size) 
+        self.fcs1 =     nn.Linear(state_size, network_shape[0])
+        self.fc2 =      nn.Linear(network_shape[0]+action_size, network_shape[1])
+        #self.fc3 =     nn.Linear(network_shape[1], network_shape[2])
+        self.fc4 =      nn.Linear(network_shape[1], 1)
         self.reset_parameters()
 
     def reset_parameters(self):
@@ -73,9 +73,11 @@ class Critic(nn.Module):
 
     def forward(self, state, action):
         """Build a critic (value) network that maps (state, action) pairs -> Q-values."""
-        x = self.bn1(state)
+        xs = self.bn1(state)
         xs = F.leaky_relu(self.fcs1(xs)) 
+
         x = torch.cat((xs, action), dim=1)
+
         x = F.leaky_relu(self.fc2(x))
         #x = F.leaky_relu(self.fc3(x))
         return self.fc4(x)
