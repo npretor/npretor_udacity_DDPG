@@ -49,19 +49,23 @@ print("Rewards:   ",env_info.rewards[agent_num])
 print("Observations:   ",env_info.vector_observations[agent_num] ) 
 print("Done status:    ",env_info.local_done[agent_num]) 
 
-agent = Agent(state_size=len(states[0]), action_size=action_size, random_seed=10, settings=settings, num_agents=num_agents) 
+agent = Agent(state_size=state_size, action_size=action_size, random_seed=10, settings=settings, num_agents=num_agents) 
 
 def ddpg(num_episodes, max_timesteps=1000):
     scores_deque = deque(maxlen=100)
     scores = []
     avg_scores = []
     max_score = -np.Inf 
-    env_info = env.reset(train_mode=True)[brain_name]
-    states = env_info.vector_observations
     
     for ith_episode in range(1, num_episodes+1): 
+        """
+        Reset the environment 
+        Get the starting states
+        """
+        env_info = env.reset(train_mode=True)[brain_name]
         agent.reset() 
         agents_scores = np.zeros(num_agents) 
+        states = env_info.vector_observations
 
         for timestep in range(max_timesteps): 
             actions = agent.act(states) 
@@ -71,7 +75,8 @@ def ddpg(num_episodes, max_timesteps=1000):
             rewards     = env_info[brain_name].rewards
             dones       = env_info[brain_name].local_done
             
-            agent.step(states, actions, rewards, next_states, dones, timestep) 
+            for n in range(num_agents):
+                agent.step(states[n], actions[n], rewards[n], next_states[n], dones[n], timestep) 
 
             states = next_states 
             agents_scores += rewards
