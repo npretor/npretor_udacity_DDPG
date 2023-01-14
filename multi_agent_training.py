@@ -1,4 +1,4 @@
-import random
+import random, time
 import torch
 import numpy as np
 from collections import deque
@@ -62,6 +62,9 @@ def ddpg(num_episodes, max_timesteps=1000):
         Reset the environment 
         Get the starting states
         """
+        print("Episode", ith_episode) 
+        startTime = time.time() 
+
         env_info = env.reset(train_mode=True)[brain_name]
         agent.reset() 
         agents_scores = np.zeros(num_agents) 
@@ -69,14 +72,15 @@ def ddpg(num_episodes, max_timesteps=1000):
 
         for timestep in range(max_timesteps): 
             actions = agent.act(states) 
-
             env_info    = env.step(actions) 
             next_states = env_info[brain_name].vector_observations
             rewards     = env_info[brain_name].rewards
             dones       = env_info[brain_name].local_done
             
-            for n in range(num_agents):
-                agent.step(states[n], actions[n], rewards[n], next_states[n], dones[n], timestep) 
+            #for n in range(num_agents):
+            #    agent.step(states[n], actions[n], rewards[n], next_states[n], dones[n], timestep) 
+            for state, action, reward, next_state, done in zip(states, actions, rewards, next_states, dones):
+                agent.step(state, action, reward, next_state, done, timestep)
 
             states = next_states 
             agents_scores += rewards
@@ -87,6 +91,8 @@ def ddpg(num_episodes, max_timesteps=1000):
         avg_score = np.mean(agents_scores)
         scores_deque.append(avg_score) 
         scores.append(avg_score) 
+
+        print("Episode duration: ", time.time() - startTime)
         
         if ith_episode % 10 == 0:        
             print("Episode: {}\t Average score: {}\t Score: {}".format(ith_episode, np.mean(scores_deque), avg_score)) 
