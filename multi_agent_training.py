@@ -68,7 +68,8 @@ def ddpg(num_episodes, max_timesteps=1000):
         env_info = env.reset(train_mode=True)[brain_name]
         agent.reset() 
         agents_scores = np.zeros(num_agents) 
-        states = env_info.vector_observations
+        states = env_info.vector_observations 
+        currentTimesteps = 0
 
         for timestep in range(max_timesteps): 
             actions = agent.act(states) 
@@ -79,12 +80,12 @@ def ddpg(num_episodes, max_timesteps=1000):
             
             #for n in range(num_agents):
             #    agent.step(states[n], actions[n], rewards[n], next_states[n], dones[n], timestep) 
-            for state, action, reward, next_state, done in zip(states, actions, rewards, next_states, dones):
-                agent.step(state, action, reward, next_state, done, timestep)
+            
+            agent.step(states, actions, rewards, next_states, dones, timestep)
 
             states = next_states 
             agents_scores += rewards
-
+            currentTimesteps = timestep
             if True in dones:
                 break
         
@@ -92,7 +93,7 @@ def ddpg(num_episodes, max_timesteps=1000):
         scores_deque.append(avg_score) 
         scores.append(avg_score) 
 
-        print("Episode duration: ", time.time() - startTime)
+        print("Episode duration: ", time.time() - startTime, "   Timesteps: ", currentTimesteps)
         
         if ith_episode % 10 == 0:        
             print("Episode: {}\t Average score: {}\t Score: {}".format(ith_episode, np.mean(scores_deque), avg_score)) 
