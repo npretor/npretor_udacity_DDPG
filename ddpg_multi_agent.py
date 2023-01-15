@@ -9,13 +9,6 @@ import torch
 import torch.nn.functional as F
 import torch.optim as optim
 
-BUFFER_SIZE = int(1e6)  # replay buffer size
-BATCH_SIZE = 128        # minibatch size
-GAMMA = 0.99            # discount factor
-TAU = 1e-3              # for soft update of target parameters
-LR_ACTOR = 1e-4         # learning rate of the actor 
-LR_CRITIC = 3e-4        # learning rate of the critic
-WEIGHT_DECAY = 0.0001   # L2 weight decay
 
 #device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 device = torch.device("cpu")
@@ -33,11 +26,15 @@ class Agent():
             action_size (int): dimension of each action
             random_seed (int): random seed
         """
+
         self.state_size = state_size
         self.action_size = action_size
         self.seed = random.seed(random_seed)
         self.settings = settings
-        self.num_agents = num_agents
+        self.num_agents = num_agents 
+
+        self.actor_loss = 0.0 
+        self.critic_loss = 0.0 
 
         # Actor Network (w/ Target Network)
         self.actor_local = Actor(state_size, action_size, random_seed, settings["actor_network_shape"]).to(device)
@@ -50,22 +47,24 @@ class Agent():
         self.critic_optimizer = optim.Adam(self.critic_local.parameters(), lr=self.settings["LR_CRITIC"], weight_decay=self.settings["WEIGHT_DECAY"])
 
         # Noise process
-        self.noise = OUNoise(action_size, random_seed)
+        self.noise = OUNoise(action_size * num_agents, random_seed)
 
         # Replay memory
         self.memory = ReplayBuffer(action_size, self.settings["BUFFER_SIZE"], self.settings["BATCH_SIZE"], random_seed)
     
-    def step(self, state, action, reward, next_state, done, timestep):
+    def step(self, states, actions, rewards, next_states, dones, timestep):
         """
         Save experience in replay memory, and use random sample from buffer to learn.
         
         """
         # Save each experience 
         #for i in range(len(states)):
-        self.memory.add(state, action, reward, next_state, done) 
+        # Accidentally put this before step, causing the agent to learn every single timestep 
+        for state, action, reward, next_state, done in zip(states, actions, rewards, next_states, dones):
+            self.memory.add(state, action, reward, next_state, done) 
 
         # Learn, if enough samples are available in memory
-        if len(self.memory) > self.settings["BATCH_SIZE"]: # and (timestep % self.settings["LEARN_EVERY"]) == 0:
+        if len(self.memory) > self.settings["BATCH_SIZE"] and timestep % self.settings["LEARN_EVERY"] == 0:
             experiences = self.memory.sample()
             self.learn(experiences, self.settings["GAMMA"]) 
 
@@ -87,13 +86,12 @@ class Agent():
 
         # Get a state from actor_local and add it to the list of states for each actor  
         with torch.no_grad():
-                 #actions[i] = self.actor_local(states[i]).cpu().data.numpy() 
-                action = self.actor_local(state).cpu().data.numpy() 
-
+            #actions[i] = self.actor_local(states[i]).cpu().data.numpy() 
+            action = self.actor_local(state).cpu().data.numpy() 
 
         self.actor_local.train()
         if add_noise:
-            action += self.noise.sample()  # unsure about this one 
+            action += self.noise.sample().reshape((-1, 4))  # unsure about this one 
         return np.clip(action, -1, 1)
 
     def reset(self):
@@ -115,34 +113,39 @@ class Agent():
 
         # ---------------------------- update critic ---------------------------- #
         # Get predicted next-state actions and Q values from target models
-        actions_next = self.actor_target(next_states)
-        Q_targets_next = self.critic_target(next_states, actions_next)
-        # Compute Q targets for current states (y_i)
-        Q_targets = rewards + (gamma * Q_targets_next * (1 - dones))
+        actions_next = self.actor_target(next_states) 
+        Q_targets_next = self.critic_target(next_states, actions_next) 
+
+        # Compute Q targets for current states (y_i) 
+        Q_targets = rewards + (gamma * Q_targets_next * (1 - dones)) 
+
         # Compute critic loss
-        Q_expected = self.critic_local(states, actions)
-        critic_loss = F.mse_loss(Q_expected, Q_targets)
+        Q_expected = self.critic_local(states, actions) 
+        critic_loss = F.mse_loss(Q_expected, Q_targets) 
+        self.critic_loss = critic_loss
+
         # Minimize the loss
-        self.critic_optimizer.zero_grad()
-        critic_loss.backward()
+        self.critic_optimizer.zero_grad() 
+        critic_loss.backward() 
 
         # Taken from: https://github.com/adaptationio/DDPG-Continuous-Control/blob/master/agent.py
-        # torch.nn.utils.clip_grad_norm_(self.critic_local.parameters(), 1)     
-
-        self.critic_optimizer.step()
+        torch.nn.utils.clip_grad_norm_(self.critic_local.parameters(), 1)     
+        self.critic_optimizer.step() 
 
         # ---------------------------- update actor ---------------------------- #
         # Compute actor loss
         actions_pred = self.actor_local(states)
         actor_loss = -self.critic_local(states, actions_pred).mean()
+        self.actor_loss = actor_loss 
+
         # Minimize the loss
         self.actor_optimizer.zero_grad()
         actor_loss.backward()
         self.actor_optimizer.step()
 
         # ----------------------- update target networks ----------------------- #
-        self.soft_update(self.critic_local, self.critic_target, TAU)
-        self.soft_update(self.actor_local, self.actor_target, TAU)                     
+        self.soft_update(self.critic_local, self.critic_target, self.settings["TAU"]) 
+        self.soft_update(self.actor_local, self.actor_target, self.settings["TAU"]) 
 
     def soft_update(self, local_model, target_model, tau):
         """Soft update model parameters.
@@ -160,13 +163,13 @@ class Agent():
 class OUNoise:
     """Ornstein-Uhlenbeck process."""
 
-    def __init__(self, size, seed, mu=0., theta=0.15, sigma=0.2):
-        """Initialize parameters and noise process."""
-        self.mu = mu * np.ones(size)
-        self.theta = theta
-        self.sigma = sigma
-        self.seed = random.seed(seed)
-        self.reset()
+    def __init__(self, size, seed, mu=0., theta=0.15, sigma=0.2): 
+        """Initialize parameters and noise process.""" 
+        self.mu = mu * np.ones(size) 
+        self.theta = theta 
+        self.sigma = sigma 
+        self.seed = random.seed(seed) 
+        self.reset() 
 
     def reset(self):
         """Reset the internal state (= noise) to mean (mu)."""
