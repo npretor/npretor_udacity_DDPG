@@ -1,4 +1,4 @@
-import random, time
+import random, time, json
 import torch
 import numpy as np
 from collections import deque
@@ -9,20 +9,8 @@ from ddpg_multi_agent import Agent
 import wandb
 
 # Hyperparameters
-settings = {
-    "BUFFER_SIZE": int(100000),     # replay buffer size 
-    "BATCH_SIZE" : 256,             # minibatch size 
-    "GAMMA" : 0.99,                  # discount factor 
-    "TAU" : 1e-3,                    # for soft update of target parameters 
-    "LR_ACTOR" : 1e-3,               # learning rate of the actor   
-    "LR_CRITIC" : 1e-3,              # learning rate of the critic  
-    "WEIGHT_DECAY": 0,              # L2 weight decay
-    "num_episodes": 1000, 
-    "max_timesteps": 1000, 
-    "actor_network_shape": [256, 128, 0],
-    "critic_network_shape": [256, 128, 0], 
-    "LEARN_EVERY": 0
-} 
+with open("hyperparameters.json", 'r') as f:
+    settings = json.load(f)
 
 
 wandb.init(project="npretor_udacity_DDPG-multiagent", config=settings) 
@@ -62,7 +50,6 @@ def ddpg(num_episodes, max_timesteps=1000):
         Reset the environment 
         Get the starting states
         """
-        print("Episode", ith_episode) 
         startTime = time.time() 
 
         env_info = env.reset(train_mode=True)[brain_name]
@@ -72,6 +59,7 @@ def ddpg(num_episodes, max_timesteps=1000):
         currentTimesteps = 0
 
         for timestep in range(max_timesteps): 
+            #import ipdb; ipdb.set_trace()
             actions = agent.act(states) 
             env_info    = env.step(actions) 
             next_states = env_info[brain_name].vector_observations
@@ -80,7 +68,6 @@ def ddpg(num_episodes, max_timesteps=1000):
             
             #for n in range(num_agents):
             #    agent.step(states[n], actions[n], rewards[n], next_states[n], dones[n], timestep) 
-            
             agent.step(states, actions, rewards, next_states, dones, timestep)
 
             states = next_states 
@@ -93,7 +80,7 @@ def ddpg(num_episodes, max_timesteps=1000):
         scores_deque.append(avg_score) 
         scores.append(avg_score) 
 
-        print("Episode duration: ", time.time() - startTime, "   Timesteps: ", currentTimesteps)
+        print("Episode ", ith_episode ," duration: ", int(time.time() - startTime), "   Timesteps: ", currentTimesteps)
         
         if ith_episode % 10 == 0:        
             print("Episode: {}\t Average score: {}\t Score: {}".format(ith_episode, np.mean(scores_deque), avg_score)) 
