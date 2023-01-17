@@ -11,7 +11,7 @@ git clone https://github.com/udacity/deep-reinforcement-learning.git
 cd deep-reinforcement-learning/python
 ```
 3. Fix an issue with Pytorch
-<b>Change the pytorch version in the requirements file to be the latest version </b>
+<b>Change the pytorch version in the requirements file to be the latest version, or remove version number altogether </b>
 4. Install requirements 
 ```
 pip install .
