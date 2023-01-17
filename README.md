@@ -1,16 +1,28 @@
 # npretor_udacity_DDPG
 Deep Deterministic Policy Gradient implimentation for Udacity DeepRL course
 
-### Activate environment for Mac
+### Setup 
+1. Install conda 
+2. Setup environment 
 ```
-cd /Users/nathan/Documents/Learning/Udacity_deepRL
-source mlagents_venv/bin/activate 
-cd /Users/nathan/Documents/repositories/deep-reinforcement-learning/p2_continuous-control 
-conda activate drlnd
+conda create --name drlnd python=3.6 
+conda activate drlnd 
+git clone https://github.com/udacity/deep-reinforcement-learning.git
+cd deep-reinforcement-learning/python
+```
+3. Fix an issue with Pytorch
+<b>Change the pytorch version in the requirements file to be the latest version </b>
+4. Install requirements 
+```
+pip install .
+```
 
+5. Create an IPython kernel for the drlnd environment.
 ```
-### Activate environment for Linux install 
+python -m ipykernel install --user --name drlnd --display-name "drlnd"
 ```
-conda activate drlnd
-
+6. Start notebook 
 ```
+python3 -m jupyter notebook 
+```
+7. Select the drlnd kernel 
