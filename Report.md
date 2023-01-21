@@ -74,3 +74,5 @@ Found out I was not connecting the state and action into the Critic.
 (dutiful-thunder-35)  Found an issue where the noise for one agent was being added to all, resulting in non-uniform noise sampling.  
 
 (denim-lake-37) Disabled weight decay, previously was set to zero
+(rare-yogurt-39) Changed both learning rates from 1e-3 to 1e-4 and training was non-existent. Flat line for 250 episodes 
+()
