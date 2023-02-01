@@ -73,4 +73,23 @@ Found out I was not connecting the state and action into the Critic.
 (graceful-morning-33) Re-enabled gradient clipping. No score difference at all on the score up to 130 episodes 
 (dutiful-thunder-35)  Found an issue where the noise for one agent was being added to all, resulting in non-uniform noise sampling.  
 
-(denim-lake-37) Disabled weight decay, previously was set to zero
+(denim-lake-37) Disabled weight decay, previously was set to zero 
+
+(lyric-armadillo-41) Weight decay was set to 999 accidentally... 
+(42) Disabled custom weight decay. Never got above 0.5
+(43) Nothing LR-A 1e-4    LR-C 1e-3 
+(44) Nothing LR-A 1e-3    LR-C 1e-4 
+(45) LR-A 1e-3    LR-C 1e-3 
+(46) Batch size 256
+(47) Batch size 1024 - max is 25 
+(48) Made tau larger by 10x. No learning, scores at 0.003 
+(50) Changed network shape to 256-128 and 256-128 
+(51) network shape is 128-64, 128-64
+
+(54) Udacity default values. No gradient clipping 
+(55) Gradient clipping for both nets 
+(57, 57) Same parameters, different seed value 
+(63) Trained to 4000, close to 30 but never reached
+(64) Failed with SIGBART at 3000 episodes  
+(65) Code bug 
+(66) Added noise scaling which should decrease noise(explore factor) as proximity to the goal approaches 
