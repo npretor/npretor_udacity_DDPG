@@ -80,6 +80,7 @@ def ddpg(num_episodes, max_timesteps=1000):
         scores_deque.append(avg_score) 
         scores.append(avg_score) 
         agent.current_avg_score = np.mean(scores_deque)    # Maybe as we get closer lower the Gamma proportionally as well? 
+        print("noise decay rate: ", agent.noise_decay_rate)
 
         print("Episode ", ith_episode ," duration: ", int(time.time() - startTime), "   Timesteps: ", currentTimesteps)
         

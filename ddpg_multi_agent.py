@@ -38,8 +38,13 @@ class Agent():
         # This method only works because I know I want to approach a score of 30
         self.current_avg_score = 0.001 
         self.goal_avg_score = 30;
+        
         # This should be zero or close to it at 30 or above, and approaching one as the current_avg approaches zero 
-        self.noise_decay_rate = 1 - (self.goal_avg_score - self.current_avg_score)      
+        if self.current_avg_score > 30:
+            current_avg_score = 30.0
+        else:
+            self.current_avg_score = self.current_avg_score 
+        self.noise_decay_rate = 1 - (self.current_avg_score/self.goal_avg_score) 
 
         self.actor_loss = 0.0 
         self.critic_loss = 0.0 
@@ -101,7 +106,8 @@ class Agent():
 
         self.actor_local.train()
         if add_noise:
-            action += self.noise.sample().reshape((-1, 4)) * self.noise_decay_rate   
+            self.noise_decay_rate = 1 - (self.current_avg_score/self.goal_avg_score)
+            action += (self.noise.sample().reshape((-1, 4)) * self.noise_decay_rate)   
         return np.clip(action, -1, 1)
 
     def reset(self):
