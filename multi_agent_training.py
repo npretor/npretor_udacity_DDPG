@@ -76,14 +76,20 @@ def ddpg(num_episodes, max_timesteps=1000):
             if True in dones:
                 break
         
-        avg_score = np.mean(agents_scores)
+        avg_score = np.mean(agents_scores) 
         scores_deque.append(avg_score) 
         scores.append(avg_score) 
+        agent.current_avg_score = np.mean(scores_deque)    # Maybe as we get closer lower the Gamma proportionally as well? 
 
         print("Episode ", ith_episode ," duration: ", int(time.time() - startTime), "   Timesteps: ", currentTimesteps)
         
         if ith_episode % 10 == 0:        
             print("Episode: {}\t Average score: {}\t Score: {}".format(ith_episode, np.mean(scores_deque), avg_score)) 
+            
+            if np.mean(scores_deque) >= 30.0:
+                print("success, saving model")
+                torch.save(agent.actor_local.state_dict(), "success_checkpoint_actor.pth")   
+                torch.save(agent.critic_local.state_dict(), "success_checkpoint_critic.pth") 
             avg_scores.append(np.mean(scores_deque))
             wandb.log({
                     "episode":ith_episode,
@@ -100,10 +106,10 @@ def ddpg(num_episodes, max_timesteps=1000):
 
 scores, avg_scores = ddpg(num_episodes=settings["num_episodes"], max_timesteps=settings["max_timesteps"]) 
 
-fig = plt.figure() 
-ax = fig.add_subplot(111) 
-#plt.plot(np.arange(1, len(scores)+1), scores) 
-plt.plot(np.arange(1, len(avg_scores)+1), avg_scores)
-plt.ylabel('Average Score') 
-plt.xlabel('Episode #') 
-plt.show() 
+# fig = plt.figure() 
+# ax = fig.add_subplot(111) 
+# plt.plot(np.arange(1, len(scores)+1), scores) 
+# plt.plot(np.arange(1, len(avg_scores)+1), avg_scores)
+# plt.ylabel('Average Score') 
+# plt.xlabel('Episode #') 
+# plt.show() 
