@@ -1,7 +1,7 @@
 # npretor_udacity_DDPG
 Deep Deterministic Policy Gradient implimentation for Udacity DeepRL course
 
-### Setup 
+## Setup 
 1. Install conda 
 2. Setup environment 
 ```
@@ -26,3 +26,16 @@ python -m ipykernel install --user --name drlnd --display-name "drlnd"
 python3 -m jupyter notebook 
 ```
 7. Select the drlnd kernel 
+
+
+## Training 
+* The working implimentation is the multi-agent training. Activate the environment, disable wandb(unless you have logged in), and run: 
+```
+conda activate drlnd 
+wandb disabled 
+cd $YOUR_REPO_INSTALL_LOCATION
+python3 multi_agent_training.py
+```
+
+### Project overview and environment 
+The environment is considered solved 
