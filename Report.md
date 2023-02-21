@@ -23,7 +23,7 @@ DDPG uses 4 networks to learn
 3. The <b>local critic and local actor</b> networks. These networks are slowly updated versions of the target networks, which serves to act as a method to minimize the swings caused by training on the various samples, and acts as as "noise smoother"
 
 The actor learns to map states to ideal actions.   State -> ideal_action    
-The critic learns to map actions to expected discounted_reward.  State, action -> Q(state, action)  
+The critic learns to map actions to expected discounted_reward.  State, action -> Q(state, action)      
 
 
 
@@ -40,9 +40,10 @@ Episodic training is used. Environment is reset and training starts.
 
 ## Hyperparameters
 > ### Buffer size 
+    The number of experiences to train on in a learning session
 
 > ### Batch size 
-    The number of experiences to train on. 
+    Subset batches of experiences in the buffer to learn from passed to the GPU. Limited by GPU RAM. 
 
 > ### Gamma 
     The rate at which to discount rewards. If Gamma is 1, the agent only learns from the current experience. If it's 0.01, it learns from 100 experiences, but the experiences are discounted linearly with the oldest having the least effect on training. 
@@ -51,10 +52,16 @@ Episodic training is used. Environment is reset and training starts.
     This is the mulitplier by which the target network is updated from the actor network. Too much updating (too large of a number) and the model would be noisy. Too little, and the model would learn too slow. 
 
 > ### Actor learning rate 
+    For the Actor learning rate I set the rate to be 0.001, same as the Critic model learning rate. I experimented with higher and lower learning rates for both models, 
+    and attempted to have variable learning rates between the models (ie Critic LR = 0.01 and actor = 0.001 and vice versa). Neither strategy worked, and 0.001 for
+    both models proved to be the best option. The learning rate is the step size taken towards the model minima. Too large of a learning rate, and the model will not converge and will bounce around. 
+    Too small of a learning rate and the model will take a very long time to converge. 
 
 > ### Critic learning rate 
+    See actor learning rate. Final value was 0.001, same as the Actor rate
 
 > ### Weight decay 
+    The L2 weight decay was set to zero which is a common method of preventing overfitting. 
 
 > ### Number of episodes 
     Number of episodes to train before ending. 
@@ -64,6 +71,24 @@ Episodic training is used. Environment is reset and training starts.
 
 > ### Learn every
     This tells the agent how often to learn. 
+
+
+## Model architectures
+This network used four neural networks per agent. Two were identical. 
+Both actor and critic are fully connected networks, with one hidden layer for each. 
+The critic network is unsual in that it accepts the state at the input to the first layer, 
+then at the second layer it concatenates the action taken by the actor, and then has one more layer after that to map the predicted reward. 
+The actor is more straightforward, it has a input layer, hidden layer, and an output layer for the output decision. 
+after several issues training agents, i settled on using Leaky Relu for the activation functions of both networks, and batch normalization on the inputs of 
+both networks as well
+
+
+## Success and resulting plot
+The model was able to reach its goal after 420 episodes with an average score across all agents of 38.487. The plot below shows steps. 
+Each step is actually 10 episodes, since i didn't record the values with any finer granularity for the average scores
+
+!['./media/ddpg_training_sessions.png']('./media/ddpg_training_sessions.png')
+
 
 ## Training notes 
 Numbers are training episodes according to wandb, but some are missing due to debugging and early termination due to crashes and segfaults. Ubuntu 18 + an nvidia graphics card = disc corruption and broken package updates every few days 
