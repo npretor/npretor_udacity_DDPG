@@ -33,6 +33,19 @@ class Agent():
         self.settings = settings
         self.num_agents = num_agents 
 
+        # Let's set this in proximity to the goal. I could set a linear value, but that's not very helpful. 
+        # Rather, if I set the noise multiplier amount proportional the proximity to a stated goal, it should auto-falloff as I approach
+        # This method only works because I know I want to approach a score of 30
+        self.current_avg_score = 0.001 
+        self.goal_avg_score = 30;
+        
+        # This should be zero or close to it at 30 or above, and approaching one as the current_avg approaches zero 
+        if self.current_avg_score > 30:
+            current_avg_score = 30.0
+        else:
+            self.current_avg_score = self.current_avg_score 
+        self.noise_decay_rate = 1 - (self.current_avg_score/self.goal_avg_score) 
+
         self.actor_loss = 0.0 
         self.critic_loss = 0.0 
 
@@ -45,6 +58,7 @@ class Agent():
         self.critic_local = Critic(state_size, action_size, random_seed, settings["critic_network_shape"]).to(device)
         self.critic_target = Critic(state_size, action_size, random_seed, settings["critic_network_shape"]).to(device)
         self.critic_optimizer = optim.Adam(self.critic_local.parameters(), lr=self.settings["LR_CRITIC"], weight_decay=self.settings["WEIGHT_DECAY"])
+        #self.critic_optimizer = optim.Adam(self.critic_local.parameters(), lr=self.settings["LR_CRITIC"]) 
 
         # Noise process
         self.noise = OUNoise(action_size * num_agents, random_seed)
@@ -64,6 +78,7 @@ class Agent():
             self.memory.add(state, action, reward, next_state, done) 
 
         # Learn, if enough samples are available in memory
+        #if len(self.memory) > self.settings["BATCH_SIZE"]:
         if len(self.memory) > self.settings["BATCH_SIZE"] and timestep % self.settings["LEARN_EVERY"] == 0:
             experiences = self.memory.sample()
             self.learn(experiences, self.settings["GAMMA"]) 
@@ -91,7 +106,8 @@ class Agent():
 
         self.actor_local.train()
         if add_noise:
-            action += self.noise.sample().reshape((-1, 4))  # unsure about this one 
+            self.noise_decay_rate = 1 - (self.current_avg_score/self.goal_avg_score)
+            action += (self.noise.sample().reshape((-1, 4)) * self.noise_decay_rate)   
         return np.clip(action, -1, 1)
 
     def reset(self):
@@ -141,6 +157,7 @@ class Agent():
         # Minimize the loss
         self.actor_optimizer.zero_grad()
         actor_loss.backward()
+        torch.nn.utils.clip_grad_norm_(self.critic_local.parameters(), 1)
         self.actor_optimizer.step()
 
         # ----------------------- update target networks ----------------------- #
