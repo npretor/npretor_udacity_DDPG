@@ -85,14 +85,18 @@ both networks as well
 
 ## Success and resulting plot
 The model was able to reach its goal after 420 episodes with an average score across all agents of 38.487. The plot below shows steps. 
-Each step is actually 10 episodes, since i didn't record the values with any finer granularity for the average scores
+Each step is actually 10 episodes, since i didn't record the values with any finer granularity for the average scores. 
+The training session was triggered so save the checkpoints and exit upon hitting the moving average success score. 
+<img src="./media/ddpg_training_sessions.png">
 
-!['./media/ddpg_training_sessions.png']('./media/ddpg_training_sessions.png')
+
+## Improvements in the future
+Selectively choose better episodes (experience prioritization)  
+Increase the number of agents adding experience to memory 
 
 
-## Training notes 
+## Training notes (for me not the course)
 Numbers are training episodes according to wandb, but some are missing due to debugging and early termination due to crashes and segfaults. Ubuntu 18 + an nvidia graphics card = disc corruption and broken package updates every few days 
-
 
 Early training episodes I trained for 20. No success, no score above 4.
 
