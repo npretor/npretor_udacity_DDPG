@@ -7,25 +7,21 @@ For a neural network to funciton, there must a <b> continuous and differentiable
 
 A DDPG contains a few things: 
 * A <b>replay buffer</b> aka memory of what has happened. This contains the: 
-  * <b>State</b> of the environment (in our case the joint positions, velocities, and ....... of the robot arm) 
-  * <b>Action</b> taken by the agent. In our case this is a move command for both of the robot's joints 
+  * <b>State</b> of the environment. The 33 variables corresponding to position, rotation, velocity, and angular velocities of the arm 
+  * <b>Action</b> taken by the agent. This is a vector with four numbers, corresponding to torque applicable to two joints. Every entry in the action vector should be a number between -1 and 1.
   * <b>Next state</b> S prime, the resulting state of the environment after the agent selects an action
   * <b>Reward</b> The award the agent was given for the action chosen.
   * <b>Done</b> TODO 
 
 For a multi-agent training session, you just stack all 20 of the experiences one by one into the buffer, increasing the number of experiences and the speed at which we can gather samples to start training. 
 
-DDPG uses a rather complicated strategy to learn, as outlined below: 
-
-DDPG uses 4 networks to learn
+DDPG uses a rather complicated strategy to learn, as outlined below. DDPG uses 4 networks to learn
 1. The <b>target actor</b> network. This network infers from the state of the environment, the optimal action to choose. This action is called A* or A-star. 
 2. The <b>target critic</b> network. This network infers the Q(discounted reward) based on the state and action given to it. It takes the action from the actor, and the state of the environment, and infers a discounted reward. 
 3. The <b>local critic and local actor</b> networks. These networks are slowly updated versions of the target networks, which serves to act as a method to minimize the swings caused by training on the various samples, and acts as as "noise smoother"
 
 The actor learns to map states to ideal actions.   State -> ideal_action    
 The critic learns to map actions to expected discounted_reward.  State, action -> Q(state, action)      
-
-
 
 ### How are the networks trained? 
 Episodic training is used. Environment is reset and training starts. 
@@ -36,7 +32,7 @@ Episodic training is used. Environment is reset and training starts.
    1. Get predicted actions and rewards from the target model 
    2. Using the predicted s, Q(s, a), compute the loss for the critic target network and back propagate.  
    3. Get a predicted action from the local network, and use the local critic's discounted reward calculate the loss and backpropagate.   
-   4. Use the local model weights to update the target network slightly. The update  
+   4. Use the local model weights to update the target network slightly. 
 
 ## Hyperparameters
 > ### Buffer size 
