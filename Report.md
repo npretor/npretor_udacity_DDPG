@@ -82,7 +82,7 @@ both networks as well
 ## Success and resulting plot
 The model was able to reach its goal after 420 episodes with an average score across all agents of 38.487. The plot below shows steps. 
 Each step is actually 10 episodes, since i didn't record the values with any finer granularity for the average scores. 
-The training session was triggered so save the checkpoints and exit upon hitting the moving average success score. 
+The training session was triggered to save the checkpoints and exit upon hitting the moving average success score. 
 <img src="./media/ddpg_training_sessions.png">
 
 
