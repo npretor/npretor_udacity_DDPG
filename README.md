@@ -38,4 +38,4 @@ python3 multi_agent_training.py
 ```
 
 ### Project overview and environment 
-The environment is considered solved 
+The environment is considered solved when the agent is able to receive an average reward (over 100 episodes, and over all 20 agents) of at least +30. 

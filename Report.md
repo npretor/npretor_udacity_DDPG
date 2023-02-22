@@ -26,13 +26,13 @@ The critic learns to map actions to expected discounted_reward.  State, action -
 ### How are the networks trained? 
 Episodic training is used. Environment is reset and training starts. 
 1. View. The environment presents a state 
-2. Act. Based on that state, the actor chooses an action. This action is combined with randomness, or noise. In my implimentation, I made the actions more adjustably noisy so that the actor is more exploratory the farther away from the goal it is. The actor has an explore-exploit ratio, and i decrease that ratio as the agent converges on the goal, very similar to the adjustable learning rate that the Adam optimizer uses to adjust neural networks so they converge. 
+2. Act. Based on that state, the actor chooses an action. This action is combined with randomness, or noise. In my implimentation I made the actions more adjustably noisy so that the actor is more exploratory the farther away from the goal it is. The actor has an explore-exploit ratio, and i decrease that ratio as the agent converges on the goal, very similar to the adjustable learning rate that the Adam optimizer uses to adjust neural networks so they converge. 
 3. Remember. The agent receives a reward and a new environment state after acting, and adds it to memory. 
 4. Learn. 
    1. Get predicted actions and rewards from the target model 
-   2. Using the predicted s, Q(s, a), compute the loss for the critic target network and back propagate.  
+   2. Using the predicted action and Q(s, a), compute the loss for the critic target network and back propagate.  
    3. Get a predicted action from the local network, and use the local critic's discounted reward calculate the loss and backpropagate.   
-   4. Use the local model weights to update the target network slightly. 
+   4. Use the local model weights to update the target network incrementally. 
 
 ## Hyperparameters
 > ### Buffer size 
@@ -87,8 +87,9 @@ The training session was triggered to save the checkpoints and exit upon hitting
 
 
 ## Improvements in the future
-Selectively choose better episodes (experience prioritization)  
+Selectively choose better episodes (prioritized experience prioritization)  
 Increase the number of agents adding experience to memory 
+Importance sampling 
 
 
 ## Training notes (for me not the course)
