@@ -13,6 +13,22 @@ import torch.optim as optim
 #device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 device = torch.device("cpu")
 
+class DemoAgent:
+    def __init__(self, state_size, action_size, seed, actor_path, critic_path, settings):
+        random.seed(seed)
+        self.actor= Actor(state_size, action_size, random.random(), settings['actor_network_shape']).to(device)
+        self.critic = Critic(state_size, action_size, random.random(), settings['critic_network_shape']).to(device)
+        self.actor.load_state_dict(torch.load(actor_path))
+        self.critic.load_state_dict(torch.load(critic_path))
+    
+    def act(self, state):
+        state = torch.from_numpy(state).float().unsqueeze(0).to(device) 
+        self.actor.eval()
+        self.critic.eval() 
+        with torch.no_grad():
+            action_values = self.actor(state) 
+        return action_values.cpu().data.numpy() 
+
 
 class Agent():
     """Interacts with and learns from the environment."""
