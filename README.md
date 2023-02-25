@@ -1,5 +1,6 @@
 # npretor_udacity_DDPG
 Deep Deterministic Policy Gradient implimentation for Udacity DeepRL course
+For my project I chose to train 20 agents(version 2 of the assigment) instead of 1. 
 
 ## Setup 
 1. Install conda 
