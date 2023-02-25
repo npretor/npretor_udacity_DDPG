@@ -85,6 +85,9 @@ Each step is actually 10 episodes, since i didn't record the values with any fin
 The training session was triggered to save the checkpoints and exit upon hitting the moving average success score. 
 <img src="./media/ddpg_training_sessions.png">
 
+Final successful training run 
+<img src="./media/run_68.png">
+
 
 ## Improvements in the future
 Selectively choose better episodes (prioritized experience prioritization)  
