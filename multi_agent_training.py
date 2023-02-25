@@ -59,15 +59,12 @@ def ddpg(num_episodes, max_timesteps=1000):
         currentTimesteps = 0
 
         for timestep in range(max_timesteps): 
-            #import ipdb; ipdb.set_trace()
             actions = agent.act(states) 
             env_info    = env.step(actions) 
             next_states = env_info[brain_name].vector_observations
             rewards     = env_info[brain_name].rewards
             dones       = env_info[brain_name].local_done
             
-            #for n in range(num_agents):
-            #    agent.step(states[n], actions[n], rewards[n], next_states[n], dones[n], timestep) 
             agent.step(states, actions, rewards, next_states, dones, timestep)
 
             states = next_states 
@@ -80,7 +77,7 @@ def ddpg(num_episodes, max_timesteps=1000):
         scores_deque.append(avg_score) 
         scores.append(avg_score) 
         agent.current_avg_score = np.mean(scores_deque)    # Maybe as we get closer lower the Gamma proportionally as well? 
-        print("noise decay rate: ", agent.noise_decay_rate)
+        #print("noise decay rate: ", agent.noise_decay_rate)
 
         print("Episode ", ith_episode ," duration: ", int(time.time() - startTime), "   Timesteps: ", currentTimesteps)
         

@@ -49,9 +49,9 @@ class Agent():
         self.settings = settings
         self.num_agents = num_agents 
 
-        # Let's set this in proximity to the goal. I could set a linear value, but that's not very helpful. 
-        # Rather, if I set the noise multiplier amount proportional the proximity to a stated goal, it should auto-falloff as I approach
-        # This method only works because I know I want to approach a score of 30
+        # Let's set this in proximity to the goal. I could set a linear value, but that's not very helpful
+        # Rather, if I set the noise multiplier amount proportional the proximity to a stated goal, so it falls off as I approach 
+        # This method only works because I know I want to approach a score of 30 
         self.current_avg_score = 0.001 
         self.goal_avg_score = 30;
         
@@ -74,7 +74,6 @@ class Agent():
         self.critic_local = Critic(state_size, action_size, random_seed, settings["critic_network_shape"]).to(device)
         self.critic_target = Critic(state_size, action_size, random_seed, settings["critic_network_shape"]).to(device)
         self.critic_optimizer = optim.Adam(self.critic_local.parameters(), lr=self.settings["LR_CRITIC"], weight_decay=self.settings["WEIGHT_DECAY"])
-        #self.critic_optimizer = optim.Adam(self.critic_local.parameters(), lr=self.settings["LR_CRITIC"]) 
 
         # Noise process
         self.noise = OUNoise(action_size * num_agents, random_seed)
@@ -88,13 +87,10 @@ class Agent():
         
         """
         # Save each experience 
-        #for i in range(len(states)):
-        # Accidentally put this before step, causing the agent to learn every single timestep 
         for state, action, reward, next_state, done in zip(states, actions, rewards, next_states, dones):
             self.memory.add(state, action, reward, next_state, done) 
 
         # Learn, if enough samples are available in memory
-        #if len(self.memory) > self.settings["BATCH_SIZE"]:
         if len(self.memory) > self.settings["BATCH_SIZE"] and timestep % self.settings["LEARN_EVERY"] == 0:
             experiences = self.memory.sample()
             self.learn(experiences, self.settings["GAMMA"]) 
@@ -108,9 +104,6 @@ class Agent():
         """
         # Convert states from numpy to tensor 
         state = torch.from_numpy(state).float().to(device) 
-
-        # Create an empty list of actions 
-        #actions = np.zeros((self.num_agents, self.action_size)) 
         
         # Set network to eval mode (as opposed to training mode)
         self.actor_local.eval() 

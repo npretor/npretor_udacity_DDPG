@@ -38,11 +38,13 @@ python3 multi_agent_training.py
 ```
 
 ### Project overview and environment 
-The environment is considered solved when the agent is able to receive an average reward (over 100 episodes, and over all 20 agents) of at least +30. 
+The observation space consists of 33 variables corresponding to position, rotation, velocity, and angular velocities of the arm. Each action is a vector with four numbers, corresponding to torque applicable to two joints.
+The environment is considered solved when the agent is able to receive an average reward over 100 episodes, and over all 20 agents, of at least 30 or higher. 
 
 
-## Testing 
+## Demo 
 ```
 wandb disabled
+conda activate drlnd
 python3 demo.py
 ```

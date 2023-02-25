@@ -11,7 +11,7 @@ A DDPG contains a few things:
   * <b>Action</b> taken by the agent. This is a vector with four numbers, corresponding to torque applicable to two joints. Every entry in the action vector should be a number between -1 and 1.
   * <b>Next state</b> S prime, the resulting state of the environment after the agent selects an action
   * <b>Reward</b> The award the agent was given for the action chosen.
-  * <b>Done</b> TODO 
+  * <b>Done</b> The environment says we are done 
 
 For a multi-agent training session, you just stack all 20 of the experiences one by one into the buffer, increasing the number of experiences and the speed at which we can gather samples to start training. 
 
@@ -79,7 +79,7 @@ after several issues training agents, i settled on using Leaky Relu for the acti
 both networks as well
 
 
-## Success and resulting plot
+## Success and Reward plot
 The model was able to reach its goal after 420 episodes with an average score across all agents of 38.487. The plot below shows steps. 
 Each step is actually 10 episodes, since i didn't record the values with any finer granularity for the average scores. 
 The training session was triggered to save the checkpoints and exit upon hitting the moving average success score. 
@@ -90,9 +90,8 @@ Final successful training run
 
 
 ## Improvements in the future
-Selectively choose better episodes (prioritized experience prioritization)  
-Increase the number of agents adding experience to memory 
-Importance sampling 
+* Selectively choose better episodes (prioritized experience prioritization)  
+* Increase the number of agents adding experience to memory  
 
 
 ## Training notes (for me not the course)
